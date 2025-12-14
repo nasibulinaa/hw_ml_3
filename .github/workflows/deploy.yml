@@ -42,4 +42,5 @@ jobs:
         run: |
           echo "Deploying to Cloud..."
           # Thanks to https://github.com/marketplace/actions/deploy-to-render-current-commit-only
+          # Added `-f` flag to curl to fail the step if deployment fails (instead of checking `/helath` because it takes too long time)
           curl -f -X POST "https://api.render.com/deploy/${{ secrets.CLOUD_TOKEN }}&imgURL=ghcr.io/${{ github.repository }}:${{ github.sha }}"
