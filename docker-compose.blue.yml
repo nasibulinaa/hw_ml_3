@@ -1,0 +1,8 @@
+services:
+  mlservice_blue:
+    build:
+      context: .
+      args:
+        - MODEL_VERSION=v1.0.0
+    ports:
+      - "8080:8080"
