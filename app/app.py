@@ -1,12 +1,14 @@
-import platform
 from flask import Flask, request
 import joblib
 import numpy as np
+from sklearn import metrics
 from sklearn.datasets import load_iris
 import os
 import json
 
-MODEL_VERSION=os.environ.get('MODEL_VERSION', "v1.1.0")
+from sklearn.model_selection import train_test_split
+
+MODEL_VERSION=os.environ.get('MODEL_VERSION', "v1.0.0")
 MODEL_PATH=os.environ.get('MODEL_PATH', f"models/iris_model_{MODEL_VERSION}.joblib")
 
 app = Flask(__name__)
@@ -21,6 +23,21 @@ def load_model():
     print("done!")
     return model
 
+def get_metrics():
+    iris = load_iris()
+    X_train, X_test, y_train, y_test = train_test_split(iris.data, iris.target, test_size=0.5, random_state=42)
+    predictions = model.predict(X_test)
+    accuracy = metrics.accuracy_score(y_test, predictions)
+    f1 = metrics.f1_score(y_test, predictions, average='weighted')
+    precision = metrics.precision_score(y_test, predictions, average='weighted')
+    recall = metrics.recall_score(y_test, predictions, average='weighted')
+    return {
+        "accuracy": accuracy,
+        "f1_score": f1,
+        "precision": precision,
+        "recall": recall
+    }
+
 model = load_model()
 iris_data = load_iris()
 feature_names = iris_data["feature_names"]
@@ -31,7 +48,8 @@ target_names = iris_data["target_names"]
 def system_info():
     return {
         'status': 'ok',
-        "version": MODEL_VERSION
+        "version": MODEL_VERSION,
+        "metrics": get_metrics()
     }
 
 # Module 2: prediction
