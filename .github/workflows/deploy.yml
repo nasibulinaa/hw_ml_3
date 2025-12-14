@@ -42,4 +42,4 @@ jobs:
         run: |
           echo "Deploying to Cloud..."
           # Thanks to https://github.com/marketplace/actions/deploy-to-render-current-commit-only
-          curl -X POST "https://api.render.com/deploy/deploy/${{ secrets.CLOUD_TOKEN }}&imgURL=ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          curl -f -X POST "https://api.render.com/deploy/${{ secrets.CLOUD_TOKEN }}&imgURL=ghcr.io/${{ github.repository }}:${{ github.sha }}"
