@@ -21,14 +21,15 @@ jobs:
       - name: Generate models
         run: bash ./contrib/prepare_dir.sh
       - name: Build Docker image
-        run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
-      - name: Push image to registry
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker push ghcr.io/${{ github.repository }}:${{ github.sha }}
+          docker build \
+            --cache-from ghcr.io/${{ github.repository }}:build-cache \
+            --cache-to ghcr.io/${{ github.repository }}:build-cache \
+            --push -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
       - name: Deploy to Cloud
+        if: github.ref == 'refs/heads/master'
         run: |
-          exit 0
-          curl -X POST https://localhost/deploy \
-            -H "Authorization: Bearer ${{ secrets.CLOUD_TOKEN }}" \
-            -d "image=ghcr.io/${{ github.repository }}:${{ github.sha }}"
+          echo "Deploying to Cloud..."
+          # Thanks to https://github.com/marketplace/actions/deploy-to-render-current-commit-only
+          curl -X POST "https://api.render.com/deploy/deploy/${{ secrets.CLOUD_TOKEN }}&imgURL=ghcr.io/${{ github.repository }}:${{ github.sha }}"
