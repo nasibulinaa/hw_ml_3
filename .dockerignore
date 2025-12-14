@@ -1,3 +1,6 @@
 docker-compose.yaml
 Dockerfile
 .github
+docs
+README.md
+contrib
