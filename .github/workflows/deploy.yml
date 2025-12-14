@@ -37,6 +37,8 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
+          build-args: |
+            MODEL_VERSION=${{ secrets.MODEL_VERSION }}
       - name: Deploy to Cloud
         if: github.ref == 'refs/heads/master'
         run: |
