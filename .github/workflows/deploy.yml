@@ -2,7 +2,7 @@ name: Deploy Model to Cloud
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
 
 jobs:
   deploy:
@@ -10,15 +10,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+          cache: 'pip'
+      - run: pip install -r requirements.txt
       - name: Generate models
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip3 install -r requirements.txt
-          ./contrib/prepare_dir.sh
+        run: bash ./contrib/prepare_dir.sh
       - name: Build Docker image
         run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .
       - name: Push image to registry
